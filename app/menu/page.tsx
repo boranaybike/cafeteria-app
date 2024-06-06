@@ -1,71 +1,42 @@
 "use client";
 import DataTable from "@/components/DataTable";
 import PageHeader from "@/components/PageHeader";
-import { Menu } from "@/models/Menu";
+import { MenuType } from "@/types/MenuType";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { NextPage } from "next";
+import { useEffect, useState } from "react";
 
-const columnHelper = createColumnHelper<Menu>();
+const columnHelper = createColumnHelper<MenuType>();
 
-const defaultData: Menu[] = [
-  {
-    foodName: "chicken burger, fries, coke",
-    day: "Monday",
-    date: new Date(),
-    booked: true,
-  },
-  {
-    foodName: "chicken burger, fries, coke",
-    day: "Tuesday",
-    date: new Date(),
-    booked: true,
-  },
-  {
-    foodName: "chicken burger, fries, coke",
-    day: "Wednesday",
-    date: new Date(),
-    booked: false,
-  },
-  {
-    foodName: "chicken burger, fries, coke",
-    day: "Thursday",
-    date: new Date(),
-    booked: true,
-  },
-];
-
-const columns: ColumnDef<Menu, any>[] = [
+const columns: ColumnDef<MenuType, any>[] = [
   columnHelper.accessor("day", {
     header: "Day",
   }),
   columnHelper.accessor("date", {
     header: "Date",
-    cell: (info) => info.getValue().toLocaleDateString(),
+    cell: (info) => info.getValue(),
   }),
-  columnHelper.accessor("foodName", {
+  columnHelper.accessor("meal", {
     header: "Menu",
-  }),
-  columnHelper.accessor("booked", {
-    header: "Booked",
-    cell: (info) => (
-      <span
-        className={
-          info.getValue() === true
-            ? "bg-green-500 text-white px-3 py-2 rounded"
-            : "bg-red-500 text-white px-3 py-2 rounded"
-        }
-      >
-        {info.getValue()}
-      </span>
-    ),
   }),
 ];
 
 const MenuList: NextPage = () => {
+  const [menuData, setMenuData] = useState([]);
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      const response = await fetch("/api/menu");
+      const menuList = await response.json();
+      setMenuData(menuList.data);
+    };
+
+    fetchMenu();
+  }, []);
   return (
     <>
-      <PageHeader title="Menu List" />
-      <DataTable columns={columns} data={defaultData} />
+      <PageHeader title="Meal List" />
+      <DataTable columns={columns} data={menuData} />
     </>
   );
 };
