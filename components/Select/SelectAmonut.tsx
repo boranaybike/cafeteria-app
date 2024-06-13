@@ -7,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { useState } from "react";
 
 interface Props {
   onAmountSelect: (amount: string) => void;

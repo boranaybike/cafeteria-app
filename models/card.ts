@@ -8,9 +8,12 @@ const CardSchema = new Schema({
     },
     number: {
         type: Number
+    },
+    balance: {
+        type: Number
     }
-    });
+    })
 
-const Card  = models.Card || model("Card", CardSchema);
+const Card  = models.Card || model("Card", CardSchema)
 
-export default Card;
+export default Card

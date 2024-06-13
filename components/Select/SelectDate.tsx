@@ -12,10 +12,17 @@ import {
 interface Props {
   onDateSelect: (date: string) => void;
   selectedDate: string;
+  excludedDates: string[]; // Yeni prop
 }
 
-const SelectDate: React.FC<Props> = ({ onDateSelect, selectedDate }) => {
+const SelectDate: React.FC<Props> = ({
+  onDateSelect,
+  selectedDate,
+  excludedDates,
+}) => {
   const [dates, setDates] = useState<string[]>([]);
+  const availableDates = dates.filter((date) => !excludedDates.includes(date));
+
   useEffect(() => {
     const generateDates = () => {
       const datesArray = [];
@@ -37,7 +44,7 @@ const SelectDate: React.FC<Props> = ({ onDateSelect, selectedDate }) => {
           <SelectValue placeholder="Date" />
         </SelectTrigger>
         <SelectContent>
-          {dates.map((date) => (
+          {availableDates.map((date) => (
             <SelectItem key={date} value={date}>
               {date}
             </SelectItem>

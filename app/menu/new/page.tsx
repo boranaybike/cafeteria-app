@@ -9,7 +9,7 @@ const CreateMenu: NextPage = () => {
   const [menu, setMenu] = useState({
     meal: "",
     day: "",
-    date: new Date(),
+    date: new Date().getDate(),
   });
 
   const handleInputChange = (e: any) => {
@@ -50,10 +50,10 @@ const CreateMenu: NextPage = () => {
           <Input type="text" name="meal" onChange={handleInputChange} />
         </div>
         <div className="flex flex-col">
-          <Label htmlFor="date" className="py-1">
-            Date
+          <Label htmlFor="day" className="py-1">
+            Day
           </Label>
-          <Input type="string" name="date" onChange={handleInputChange} />
+          <Input type="string" name="day" onChange={handleInputChange} />
         </div>
         <div className="align-center flex flex-col">
           <Button type="submit" className="flex flex-col justify-center">

@@ -3,12 +3,13 @@ import Menu from "@/models/Menu"
 
 export const POST = async (request:any) => {
 
-    const {meal, date} = await request.json();
+    const {meal, date, day} = await request.json();
     try {
         await connectToDB()
         const newMenu= new Menu({
             meal,
-            date
+            date,
+            day
         })
         await newMenu.save()
         return new Response(JSON.stringify({ success: true, data: newMenu }), { status: 201 })

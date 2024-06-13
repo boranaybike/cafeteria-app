@@ -1,89 +1,50 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import DataTable from "@/components/DataTable";
+import LoginDialog from "@/components/LoginDialog";
+import PageHeader from "@/components/PageHeader";
+import { MenuType } from "@/types/MenuType";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+const columnHelper = createColumnHelper<MenuType>();
+
+const columns: ColumnDef<MenuType, any>[] = [
+  columnHelper.accessor("day", {
+    header: "Day",
+  }),
+  columnHelper.accessor("meal", {
+    header: "Menu",
+  }),
+  columnHelper.accessor("date", {
+    header: "Date",
+    cell: (info) => info.getValue(),
+  }),
+];
 
 export default function Home() {
-  const [formData, setFormData] = useState({
-    userName: "",
-    password: "",
-  });
+  const [menuData, setMenuData] = useState([]);
 
-  const handleInputChange = (e: any) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+  useEffect(() => {
+    const fetchMenu = async () => {
+      const response = await fetch("/api/menu");
+      const menuList = await response.json();
+      setMenuData(menuList.data);
+    };
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        body: JSON.stringify(formData),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    fetchMenu();
+  }, []);
+  const router = useRouter();
 
-      if (response.ok) {
-        window.location.href = "/home";
-      } else {
-        const data = await response.json();
-        alert(data.message);
-      }
-    } catch (error) {
-      console.error("An error ocurred.", error);
-    }
+  const handleSuccessLogin = () => {
+    router.push("/menu");
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">LOGIN</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>LOGIN</DialogTitle>
-          <DialogDescription>Lorem ipsum</DialogDescription>
-        </DialogHeader>
-
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <div className="flex flex-col">
-            <Label htmlFor="username" className="py-1">
-              Card Number
-            </Label>
-            <Input type="text" name="userName" onChange={handleInputChange} />
-          </div>
-          <div className="flex flex-col">
-            <Label htmlFor="password" className="py-1">
-              Password
-            </Label>
-            <Input
-              type="password"
-              name="password"
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <div className="align-center flex flex-col">
-            <Button type="submit" className="flex flex-col justify-center">
-              LOGIN
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <>
+      <PageHeader title="Meal List" />
+      <DataTable columns={columns} data={menuData} />
+      <LoginDialog onSuccessLogin={handleSuccessLogin} />
+    </>
   );
 }

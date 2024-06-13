@@ -21,7 +21,7 @@ interface ITableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
-export default function DDataTable<TData, TValue>({
+export default function DataTable<TData, TValue>({
   columns,
   data,
 }: ITableProps<TData, TValue>) {
