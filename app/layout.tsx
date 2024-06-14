@@ -19,36 +19,28 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const inter = Inter({ subsets: ["latin"] });
 import LogoutButton from "@/components/LogoutButton";
 import { useEffect, useState } from "react";
-import { JwtPayload, jwtDecode } from "jwt-decode";
-interface tokenPayload extends JwtPayload {
-  first_name: string;
-  last_name: string;
-  role: string;
-}
+import { jwtDecode } from "jwt-decode";
+import { tokenPayload } from "@/types/TokenPayload";
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [userName, setUserName] = useState("");
-  const [userSurname, setUserSurname] = useState("");
-  const [userRole, setUserRole] = useState("");
+  const [user, setUser] = useState<tokenPayload | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("user") || "";
     if (token) {
       const user = jwtDecode<tokenPayload>(token);
-      setUserRole(user.role);
-      setUserName(user.first_name);
-      setUserSurname(user.last_name);
+      setUser(user);
     }
   }, []);
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        {userRole === "employee" ? (
+        {user?.role === "employee" ? (
           <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
             <div className="hidden border-r bg-muted/40 md:block">
               <div className="flex h-full max-h-screen flex-col gap-2">
@@ -71,7 +63,7 @@ export default function RootLayout({
                       <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                     <h3 className="px-3">
-                      {userName} {userSurname}
+                      {user.first_name} {user.last_name}
                     </h3>
                   </div>
                   <nav className="grid items-start px-2 text-sm font-medium lg:px-4">

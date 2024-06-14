@@ -12,7 +12,7 @@ import {
 interface Props {
   onDateSelect: (date: string) => void;
   selectedDate: string;
-  excludedDates: string[]; // Yeni prop
+  excludedDates: string[];
 }
 
 const SelectDate: React.FC<Props> = ({

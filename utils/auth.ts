@@ -11,22 +11,22 @@ export const getSecret = () => {
 
 export const verifyJwtToken = async (token: string | Uint8Array) => {
   try {
-    const { payload } = await jwtVerify(token, getSecret());
+    const { payload } = await jwtVerify(token, getSecret())
     return payload
   } catch (error) {
-    return null;
+    return null
   }
 }
 
 export const logout = () => {
-  const response = NextResponse.json({ success: true }, { status: 200 });
+  const response = NextResponse.json({ success: true }, { status: 200 })
   response.cookies.set({
     name: "Token",
     value: "",
     path: "/",
     maxAge: 0,
-    httpOnly: true,
+    httpOnly: true
   });
 
-  return response;
+  return response
 }

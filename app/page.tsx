@@ -4,6 +4,7 @@ import LoginDialog from "@/components/LoginDialog";
 import PageHeader from "@/components/PageHeader";
 import { MenuType } from "@/types/MenuType";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -22,17 +23,26 @@ const columns: ColumnDef<MenuType, any>[] = [
   }),
 ];
 
+const fetchMenu = async () => {
+  try {
+    const response = await axios.get("/api/menu");
+    const menuList = response.data;
+    return menuList.data;
+  } catch (error) {
+    console.log("error fetch menu:", error);
+    return [];
+  }
+};
+
 export default function Home() {
   const [menuData, setMenuData] = useState([]);
 
   useEffect(() => {
-    const fetchMenu = async () => {
-      const response = await fetch("/api/menu");
-      const menuList = await response.json();
-      setMenuData(menuList.data);
+    const fetchData = async () => {
+      const menuData = await fetchMenu();
+      setMenuData(menuData);
     };
-
-    fetchMenu();
+    fetchData();
   }, []);
   const router = useRouter();
 
