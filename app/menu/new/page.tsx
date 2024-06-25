@@ -11,16 +11,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MenuType } from "@/types/MenuType";
-import { GetDayList } from "@/utils/shared";
+import { getDayOfWeek } from "@/utils/shared";
 import axios from "axios";
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
-
-const getDayOfWeek = (date: string) => {
-  const days = GetDayList();
-  const dayIndex = new Date(date).getDay();
-  return days[dayIndex];
-};
 
 const CreateMenu: NextPage = () => {
   const [menu, setMenu] = useState({
@@ -29,7 +23,9 @@ const CreateMenu: NextPage = () => {
     date: "",
   });
 
-  const handleChange = (e: any) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setMenu((prevMenu) => ({
       ...prevMenu,
@@ -71,12 +67,12 @@ const CreateMenu: NextPage = () => {
       console.error("An error occurred while fetching menu data.", error);
     }
   };
+
+  const addedDates = menuData.map((menu) => menu.date);
+
   useEffect(() => {
     fetchMenu();
   }, []);
-
-  const addedDates = menuData.map((menu) => menu.date);
-  console.log(addedDates);
 
   return (
     <div>

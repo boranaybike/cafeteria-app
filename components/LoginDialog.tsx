@@ -1,3 +1,4 @@
+"use client";
 import {
   Dialog,
   DialogContent,
@@ -11,12 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
-interface Props {
-  onSuccessLogin: () => void;
-}
-
-const LoginDialog: React.FC<Props> = ({ onSuccessLogin }) => {
+const LoginDialog: React.FC = () => {
   const [formData, setFormData] = useState({
     card_number: "",
     password: "",
@@ -29,6 +27,7 @@ const LoginDialog: React.FC<Props> = ({ onSuccessLogin }) => {
       [name]: value,
     }));
   };
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,7 +36,7 @@ const LoginDialog: React.FC<Props> = ({ onSuccessLogin }) => {
         if (response.status === 200) {
           localStorage.setItem("user", response.data.token);
           console.log("Login successful");
-          onSuccessLogin();
+          router.push("/menu");
         } else {
           console.error("Login failed");
         }

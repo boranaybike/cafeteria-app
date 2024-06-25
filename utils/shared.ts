@@ -11,4 +11,11 @@ export const GetDayList = () =>{
     "Thursday",
     "Friday",
     "Saturday"
-  ]}
+    ]
+}
+
+export const getDayOfWeek = (date: string) => {
+    const days = GetDayList()
+    const dayIndex = new Date(date).getDay()
+    return days[dayIndex]
+}

@@ -55,7 +55,6 @@ const BookingPage: NextPage = () => {
         (reservation: any) => reservation.creator === user.user_id
       );
       setReservationData(userReservations);
-
       const active = userReservations.filter((reservation: ReservationType) =>
         isFuture(new Date(reservation.date))
       );
@@ -96,7 +95,7 @@ const BookingPage: NextPage = () => {
       });
       fetchBooking();
     } catch (error) {
-      console.error("Error creating reservation:", error);
+      console.error("Error creating reservation: ", error);
     }
   };
 
@@ -106,7 +105,7 @@ const BookingPage: NextPage = () => {
       console.log("Reservation cancelled successfully!");
       fetchBooking();
     } catch (error) {
-      console.error("Error cancelling reservation:", error);
+      console.error("Error cancelling reservation: ", error);
     }
   };
 
@@ -132,6 +131,18 @@ const BookingPage: NextPage = () => {
           Cancel Reservation
         </Button>
       ),
+    }),
+  ];
+
+  const pastResColumns: ColumnDef<ReservationType, any>[] = [
+    columnHelper.accessor("menu.meal", {
+      header: "Menu",
+    }),
+    columnHelper.accessor("date", {
+      header: "Date",
+    }),
+    columnHelper.accessor("amount", {
+      header: "Amount",
     }),
   ];
 
@@ -199,7 +210,7 @@ const BookingPage: NextPage = () => {
             </CardHeader>
             {pastReservations && (
               <CardContent>
-                <DataTable columns={columns} data={pastReservations} />
+                <DataTable columns={pastResColumns} data={pastReservations} />
               </CardContent>
             )}
           </Card>
