@@ -9,13 +9,14 @@ export const POST = async (request: any) => {
     await connectToDB()
     const { card_number, password } = await request.json()
     const existingUser = await User.findOne({ card_number: card_number})
-    console.log(existingUser)
+
     if (!existingUser || existingUser.password !== password) {
       return NextResponse.json({
         error: "Invalid credentials",
         success: false
       }, { status: 401 })
     }
+    
     const token = await new SignJWT({
       card_number: existingUser.card_number,
       role: existingUser.role,

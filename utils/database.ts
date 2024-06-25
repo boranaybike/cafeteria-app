@@ -16,5 +16,5 @@ export const connectToDB = async () => {
     } catch (error) {
         console.error('Error connecting to MongoDB:', error);
     }
-        isConnected = mongoose.connections[0].readyState === 1;
+    isConnected = mongoose.connections[0].readyState === 1;
 }

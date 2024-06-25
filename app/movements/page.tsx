@@ -1,4 +1,5 @@
 "use client";
+import { NextPage } from "next";
 import DataTable from "@/components/DataTable";
 import PageHeader from "@/components/PageHeader";
 import { MovementType } from "@/types/MovementType";
@@ -22,7 +23,7 @@ const columns: ColumnDef<MovementType, any>[] = [
   }),
 ];
 
-const MovementsPage: React.FC = () => {
+const MovementsPage: NextPage = () => {
   const [movementData, setMovementData] = useState([]);
 
   useEffect(() => {

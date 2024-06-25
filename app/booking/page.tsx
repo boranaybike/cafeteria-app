@@ -48,23 +48,28 @@ const BookingPage: NextPage = () => {
   }, []);
 
   const fetchBooking = async () => {
-    const response = await axios.get("/api/booking");
-    const reservationList = response.data;
-    if (user && user.user_id) {
-      const userReservations = reservationList.data.filter(
-        (reservation: any) => reservation.creator === user.user_id
-      );
-      setReservationData(userReservations);
-      const active = userReservations.filter((reservation: ReservationType) =>
-        isFuture(new Date(reservation.date))
-      );
-      const past = userReservations.filter((reservation: ReservationType) =>
-        isPast(new Date(reservation.date))
-      );
-      setActiveReservations(active);
-      setPastReservations(past);
+    try {
+      const response = await axios.get("/api/booking");
+      const reservationList = response.data;
+      if (user && user.user_id) {
+        const userReservations = reservationList.data.filter(
+          (reservation: any) => reservation.creator === user.user_id
+        );
+        setReservationData(userReservations);
+        const active = userReservations.filter((reservation: ReservationType) =>
+          isFuture(new Date(reservation.date))
+        );
+        const past = userReservations.filter((reservation: ReservationType) =>
+          isPast(new Date(reservation.date))
+        );
+        setActiveReservations(active);
+        setPastReservations(past);
+      }
+    } catch (error) {
+      console.error("Error fetching reservations: ", error);
     }
   };
+  const reservedDates = reservationData.map((reservation) => reservation.date);
 
   useEffect(() => {
     if (user) {
@@ -145,8 +150,6 @@ const BookingPage: NextPage = () => {
       header: "Amount",
     }),
   ];
-
-  const reservedDates = reservationData.map((reservation) => reservation.date);
 
   if (!user) {
     return <div>Loading...</div>;

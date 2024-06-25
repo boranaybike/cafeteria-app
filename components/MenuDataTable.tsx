@@ -17,10 +17,7 @@ const columns: ColumnDef<MenuType, any>[] = [
   }),
   columnHelper.accessor("date", {
     header: "Date",
-    cell: ({ row }) => {
-      const formattedDate = format(new Date(row.original.date), "yyyy-MM-dd");
-      return <>{formattedDate}</>;
-    },
+    cell: ({ row }) => format(new Date(row.original.date), "yyyy-MM-dd"),
   }),
 ];
 
@@ -30,7 +27,6 @@ const MenuList: React.FC = () => {
     const fetchMenu = async () => {
       try {
         const response = await axios.get("/api/menu");
-        console.log("ok!");
         const menu = response.data.data;
         const activeMenuData = menu.filter((menu: MenuType) =>
           isFuture(new Date(menu.date))

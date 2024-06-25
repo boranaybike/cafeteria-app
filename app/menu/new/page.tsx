@@ -23,6 +23,8 @@ const CreateMenu: NextPage = () => {
     date: "",
   });
 
+  const [menuData, setMenuData] = useState<MenuType[]>([]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -57,18 +59,16 @@ const CreateMenu: NextPage = () => {
     }
   };
 
-  const [menuData, setMenuData] = useState<MenuType[]>([]);
-
   const fetchMenu = async () => {
     try {
       const response = await axios.get("/api/menu");
-      setMenuData(response.data.data);
+      const data = response.data.data;
+      setMenuData(data);
     } catch (error) {
-      console.error("An error occurred while fetching menu data.", error);
+      console.error("Error fetching menu: ", error);
     }
   };
-
-  const addedDates = menuData.map((menu) => menu.date);
+  const dates = menuData.map((menu) => menu.date);
 
   useEffect(() => {
     fetchMenu();
@@ -100,7 +100,7 @@ const CreateMenu: NextPage = () => {
                     <SelectDate
                       onDateSelect={(date) => handleSelectChange("date", date)}
                       selectedDate={menu.date}
-                      excludedDates={addedDates}
+                      excludedDates={dates}
                     />
                   </div>
                 </div>

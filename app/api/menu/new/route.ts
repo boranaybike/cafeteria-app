@@ -1,7 +1,7 @@
 import { connectToDB } from "@/utils/database"
 import Menu from "@/models/Menu"
 
-export const POST = async (request:any) => {
+export const POST = async (request: any) => {
 
     const {meal, date, day} = await request.json();
     try {

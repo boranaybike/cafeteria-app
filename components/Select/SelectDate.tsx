@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Label } from "../ui/label";
-import { format, addDays } from "date-fns";
+import { format, addDays, parseISO } from "date-fns";
 import {
   Select,
   SelectContent,
@@ -21,7 +21,13 @@ const SelectDate: React.FC<Props> = ({
   excludedDates,
 }) => {
   const [dates, setDates] = useState<string[]>([]);
-  const availableDates = dates.filter((date) => !excludedDates.includes(date));
+
+  const formattedExcludedDates = excludedDates.map((date) =>
+    format(parseISO(date), "yyyy-MM-dd")
+  );
+  const availableDates = dates.filter(
+    (date) => !formattedExcludedDates.includes(date)
+  );
 
   useEffect(() => {
     const generateDates = () => {
