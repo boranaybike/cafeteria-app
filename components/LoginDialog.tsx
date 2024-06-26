@@ -10,15 +10,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 
 const LoginDialog: React.FC = () => {
   const [formData, setFormData] = useState({
     card_number: "",
     password: "",
   });
+
+  const { user, login } = useUser();
+  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -27,14 +31,13 @@ const LoginDialog: React.FC = () => {
       [name]: value,
     }));
   };
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       axios.post("/api/auth/signin", formData).then((response) => {
         if (response.status === 200) {
-          localStorage.setItem("user", response.data.token);
+          login(response.data.token);
           console.log("Login successful");
           router.push("/");
         } else {
@@ -42,20 +45,12 @@ const LoginDialog: React.FC = () => {
         }
       });
     } catch (error) {
-      console.error("An error occurred", error);
+      console.error("An error occurred: ", error);
     }
   };
-
-  const [isUser, setIsUser] = useState<boolean | null>(null);
-  useEffect(() => {
-    const token = localStorage.getItem("user") || "";
-    if (token) {
-      setIsUser(true);
-    }
-  }, []);
   return (
     <>
-      {!isUser && (
+      {!user && (
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline">LOGIN</Button>

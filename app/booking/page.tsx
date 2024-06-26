@@ -15,11 +15,10 @@ import {
 import { ReservationType } from "@/types/ReservationType";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { isFuture, isPast } from "date-fns";
-import { tokenPayload } from "@/types/TokenPayload";
+import { useUser } from "@/context/UserContext";
 
 const BookingPage: NextPage = () => {
   const [booking, setBooking] = useState({
@@ -27,7 +26,9 @@ const BookingPage: NextPage = () => {
     amount: "1",
     menu: "",
   });
-  const [user, setUser] = useState<tokenPayload | null>(null);
+
+  const { user } = useUser();
+
   const [reservationData, setReservationData] = useState<ReservationType[]>([]);
   const [activeReservations, setActiveReservations] = useState<
     ReservationType[]
@@ -35,17 +36,6 @@ const BookingPage: NextPage = () => {
   const [pastReservations, setPastReservations] = useState<ReservationType[]>(
     []
   );
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const token = localStorage.getItem("user") || "";
-      if (token) {
-        const decodedUser = jwtDecode<tokenPayload>(token);
-        setUser(decodedUser);
-      }
-    };
-    fetchUser();
-  }, []);
 
   const fetchBooking = async () => {
     try {
@@ -150,11 +140,6 @@ const BookingPage: NextPage = () => {
       header: "Amount",
     }),
   ];
-
-  if (!user) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <>
       <PageHeader title="My Reservations" />
