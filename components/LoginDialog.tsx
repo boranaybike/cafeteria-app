@@ -53,7 +53,7 @@ const LoginDialog: React.FC = () => {
       {!user && (
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="outline">LOGIN</Button>
+            <Button className="bg-orange-600 hover:bg-orange-700">LOGIN</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>

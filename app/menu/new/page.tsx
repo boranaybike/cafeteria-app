@@ -55,7 +55,7 @@ const CreateMenu: NextPage = () => {
       });
       fetchMenu();
     } catch (error) {
-      console.error("Error creating menu:", error);
+      console.error("Error creating menu: ", error);
     }
   };
 
@@ -113,7 +113,10 @@ const CreateMenu: NextPage = () => {
               </div>
             </CardContent>
             <CardFooter className="flex justify-end gap-6">
-              <Button type="submit" className="flex flex-col justify-center">
+              <Button
+                type="submit"
+                className="bg-orange-600 hover:bg-orange-700"
+              >
                 ADD MENU
               </Button>
             </CardFooter>

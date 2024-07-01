@@ -98,15 +98,11 @@ const SideBar: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col md:hidden">
             <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="shrink-0 md:hidden"
-                  >
+                  <Button variant="outline" size="icon" className="shrink-0">
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
