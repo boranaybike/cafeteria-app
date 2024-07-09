@@ -6,23 +6,26 @@ export const POST = async (request: any) => {
   try {
     await connectToDB()
 
-    const { date, product, amount , user_id, menu} = await request.json()
+    const { reservations } = await request.json();
+
+    const savedReservations = [];
+
+    for (const reservation of reservations) {
+      const { amount, creator, menu } = reservation;
 
     const newBooking = new Booking({
-      date,
-      product,
       amount,
-      creator: user_id,
-      menu: menu
+      creator,
+      menu
     })
-
     await newBooking.save()
+      savedReservations.push(newBooking);
+    }
 
-    return NextResponse.json({
-      success: true,
-      message: "Booking created successfully"
-    }, { status: 200 })
+    return NextResponse.json({ success: true, message: "Bookings created successfully"}, { status: 200 })
   } catch (error: any) {
+    
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
+

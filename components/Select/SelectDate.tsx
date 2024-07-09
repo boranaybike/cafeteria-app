@@ -33,7 +33,7 @@ const SelectDate: React.FC<Props> = ({
     const generateDates = () => {
       const datesArray = [];
       const today = new Date();
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 20; i++) {
         datesArray.push(format(addDays(today, i), "yyyy-MM-dd"));
       }
       setDates(datesArray);

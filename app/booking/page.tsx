@@ -1,9 +1,6 @@
 "use client";
 import DataTable from "@/components/DataTable";
 import PageHeader from "@/components/PageHeader";
-import SelectAmount from "@/components/Select/SelectAmonut";
-import SelectDate from "@/components/Select/SelectDate";
-import SelectMenu from "@/components/Select/SelectMenu";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,85 +9,120 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ReservationType } from "@/types/ReservationType";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import axios from "axios";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
-import { isFuture, isPast } from "date-fns";
+import { format, isFuture } from "date-fns";
 import { useUser } from "@/context/UserContext";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Minus, Plus } from "lucide-react";
+import { MenuType } from "@/types/MenuType";
+import { BookingType } from "@/types/BookingType";
+
+interface Reservation {
+  isChecked: boolean;
+  amount: number;
+}
 
 const BookingPage: NextPage = () => {
-  const [booking, setBooking] = useState({
-    date: "",
-    amount: "1",
-    menu: "",
-  });
-
   const { user } = useUser();
-
-  const [reservationData, setReservationData] = useState<ReservationType[]>([]);
-  const [activeReservations, setActiveReservations] = useState<
-    ReservationType[]
-  >([]);
-  const [pastReservations, setPastReservations] = useState<ReservationType[]>(
-    []
-  );
-
-  const fetchBooking = async () => {
-    try {
-      const response = await axios.get("/api/booking");
-      const reservationList = response.data;
-      if (user && user.user_id) {
-        const userReservations = reservationList.data.filter(
-          (reservation: any) => reservation.creator === user.user_id
-        );
-        setReservationData(userReservations);
-        const active = userReservations.filter((reservation: ReservationType) =>
-          isFuture(new Date(reservation.date))
-        );
-        const past = userReservations.filter((reservation: ReservationType) =>
-          isPast(new Date(reservation.date))
-        );
-        setActiveReservations(active);
-        setPastReservations(past);
-      }
-    } catch (error) {
-      console.error("Error fetching reservations: ", error);
-    }
-  };
-  const reservedDates = reservationData.map((reservation) => reservation.date);
+  const [selectedReservations, setSelectedReservations] = useState<
+    Record<string, Reservation>
+  >({});
+  const [existingReservations, setExistingReservations] = useState<
+    Record<string, Reservation>
+  >({});
+  const [menuList, setMenuList] = useState([]);
 
   useEffect(() => {
+    const fetchMenuAndBookings = async () => {
+      try {
+        const menuResponse = await axios.get("/api/menu");
+        const menu: MenuType[] = menuResponse.data.data;
+        const activeMenuList = menu.filter((menu: any) =>
+          isFuture(new Date(menu.date))
+        );
+
+        const bookingResponse = await axios.get("/api/booking");
+        const reservationList = bookingResponse.data.data;
+
+        if (user && user.user_id) {
+          const userReservations = reservationList.filter(
+            (reservation: BookingType) =>
+              reservation.creator?._id === user.user_id
+          );
+
+          const combinedMenuList = activeMenuList.map((menu: any) => {
+            const existingReservation = userReservations.find(
+              (reservation: any) => reservation.menu?._id === menu._id
+            );
+            return {
+              ...menu,
+              isChecked: !!existingReservation,
+              amount: existingReservation ? existingReservation.amount : 1,
+            };
+          });
+
+          setMenuList(combinedMenuList);
+          const existingRes: Record<string, Reservation> = {};
+          combinedMenuList.forEach((menu: any) => {
+            if (menu.isChecked) {
+              existingRes[menu._id] = {
+                isChecked: menu.isChecked,
+                amount: menu.amount,
+              };
+            }
+          });
+          setExistingReservations(existingRes);
+          setSelectedReservations(existingRes);
+        }
+      } catch (error) {
+        console.error("Error fetching menu and reservations: ", error);
+      }
+    };
+
     if (user) {
-      fetchBooking();
+      fetchMenuAndBookings();
     }
   }, [user]);
 
-  const handleChange = (field: string, value: string) => {
-    setBooking((prevBooking) => ({
-      ...prevBooking,
-      [field]: value,
+  const handleChange = (menuId: string, field: string, value: any) => {
+    setSelectedReservations((prevSelected: any) => ({
+      ...prevSelected,
+      [menuId]: {
+        ...prevSelected[menuId],
+        [field]: value,
+      },
     }));
   };
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const newReservations = Object.entries(selectedReservations)
+      .filter(
+        ([menuId, value]) =>
+          value.isChecked && !(menuId in existingReservations)
+      )
+      .map(([menuId, value]) => ({
+        amount: value.amount,
+        menu: menuId,
+        creator: user?.user_id,
+      }));
+
+    if (newReservations.length === 0) {
+      console.log("No new reservations to create.");
+      return;
+    }
+
     try {
-      await axios.post("/api/booking/new", {
-        ...booking,
-        user_id: user?.user_id,
+      const response = await axios.post("/api/booking/new", {
+        reservations: newReservations,
       });
-      console.log("Reservation created successfully!");
-      setBooking({
-        date: "",
-        amount: "1",
-        menu: "",
-      });
-      fetchBooking();
-    } catch (error) {
-      console.error("Error creating reservation: ", error);
+      console.log("Reservations created successfully!", response.data.data);
+    } catch (error: any) {
+      console.error("Error creating reservation: ", error.response.data);
     }
   };
 
@@ -98,23 +130,89 @@ const BookingPage: NextPage = () => {
     try {
       await axios.delete(`/api/booking/${reservationId}`);
       console.log("Reservation cancelled successfully!");
-      fetchBooking();
     } catch (error) {
       console.error("Error cancelling reservation: ", error);
     }
   };
 
-  const columnHelper = createColumnHelper<ReservationType>();
+  const columnHelper = createColumnHelper<any>();
 
-  const columns: ColumnDef<ReservationType, any>[] = [
-    columnHelper.accessor("menu.meal", {
+  const columns: ColumnDef<any, any>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <div className="p-2">
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+            aria-label="Select all"
+          />
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="p-2">
+          <Checkbox
+            checked={selectedReservations[row.original._id]?.isChecked}
+            onCheckedChange={(value) =>
+              handleChange(row.original._id, "isChecked", !!value)
+            }
+            aria-label="Select row"
+          />
+        </div>
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    columnHelper.accessor("date", {
+      header: () => <div className="p-2">Day & Date</div>,
+      cell: ({ row }) => (
+        <div className="p-2">
+          <div>{row.original.day}</div>
+          <div>{format(new Date(row.original.date), "yyyy-MM-dd")}</div>
+        </div>
+      ),
+    }),
+    columnHelper.accessor("meal", {
       header: "Menu",
     }),
-    columnHelper.accessor("date", {
-      header: "Date",
-    }),
     columnHelper.accessor("amount", {
-      header: "Amount",
+      header: () => <div className="p-2">Amount</div>,
+      cell: ({ row }) => (
+        <div className="flex items-center text-center flex-row gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() =>
+              handleChange(
+                row.original._id,
+                "amount",
+                (selectedReservations[row.original._id]?.amount || 1) - 1
+              )
+            }
+          >
+            <Minus />
+          </Button>
+          <h1>{selectedReservations[row.original._id]?.amount || 1}</h1>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() =>
+              handleChange(
+                row.original._id,
+                "amount",
+                (selectedReservations[row.original._id]?.amount || 1) + 1
+              )
+            }
+          >
+            <Plus />
+          </Button>
+        </div>
+      ),
     }),
     columnHelper.display({
       id: "actions",
@@ -129,80 +227,30 @@ const BookingPage: NextPage = () => {
     }),
   ];
 
-  const pastResColumns: ColumnDef<ReservationType, any>[] = [
-    columnHelper.accessor("menu.meal", {
-      header: "Menu",
-    }),
-    columnHelper.accessor("date", {
-      header: "Date",
-    }),
-    columnHelper.accessor("amount", {
-      header: "Amount",
-    }),
-  ];
   return (
     <>
       <PageHeader title="My Reservations" />
-      <div className="grid grid-cols-3 gap-16">
-        <div>
-          <form onSubmit={handleFormSubmit}>
-            <Card className="w-full">
-              <CardHeader>
-                <CardTitle>Make a new Reservation</CardTitle>
-              </CardHeader>
+      <div>
+        <Card className="w-full mb-4">
+          <CardHeader>
+            <CardTitle>Make a new Reservation</CardTitle>
+          </CardHeader>
+          {menuList.length > 0 && (
+            <form onSubmit={handleFormSubmit}>
               <CardContent>
-                <div className="grid w-full items-center gap-4">
-                  <div className="flex flex-col space-y-1.5">
-                    <SelectDate
-                      onDateSelect={(date) => handleChange("date", date)}
-                      selectedDate={booking.date}
-                      excludedDates={reservedDates}
-                    />
-                  </div>
-                  <div className="flex flex-col space-y-1.5">
-                    <SelectAmount
-                      onAmountSelect={(amount) =>
-                        handleChange("amount", amount)
-                      }
-                      selectedAmount={booking.amount}
-                    />
-                  </div>
-                  <div className="flex flex-col space-y-1.5">
-                    <SelectMenu
-                      onMenuChange={(menuId) => handleChange("menu", menuId)}
-                      selectedMenu={booking.menu}
-                    />
-                  </div>
-                </div>
+                <DataTable columns={columns} data={menuList} />
               </CardContent>
               <CardFooter className="flex justify-end gap-6">
-                <Button type="submit">Make Reservation</Button>
+                <Button
+                  type="submit"
+                  className="bg-orange-600 hover:bg-orange-700"
+                >
+                  Make Reservation
+                </Button>
               </CardFooter>
-            </Card>
-          </form>
-        </div>
-        <div className="col-span-2">
-          <Card className="w-full mb-4">
-            <CardHeader>
-              <CardTitle>Active Reservations</CardTitle>
-            </CardHeader>
-            {activeReservations && (
-              <CardContent>
-                <DataTable columns={columns} data={activeReservations} />
-              </CardContent>
-            )}
-          </Card>
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle>Past Reservations</CardTitle>
-            </CardHeader>
-            {pastReservations && (
-              <CardContent>
-                <DataTable columns={pastResColumns} data={pastReservations} />
-              </CardContent>
-            )}
-          </Card>
-        </div>
+            </form>
+          )}
+        </Card>
       </div>
     </>
   );

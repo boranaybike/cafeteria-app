@@ -4,6 +4,8 @@ import { connectToDB } from "@/utils/database"
 export const GET = async () => {
     try {
         await connectToDB();
+        const currentDate = new Date();
+        await Menu.deleteMany({ date: { $lt: currentDate } });
         const menu = await Menu.find();
         return new Response(JSON.stringify({ success: true, data: menu }), {status: 200});
     } catch (error) {
