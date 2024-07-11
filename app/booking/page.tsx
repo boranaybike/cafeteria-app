@@ -31,7 +31,7 @@ const BookingPage: NextPage = () => {
   const [selectedReservations, setSelectedReservations] = useState<
     Record<string, Reservation>
   >({});
-  const [menuList, setMenuList] = useState([]);
+  const [menuList, setMenuList] = useState<MenuType[]>([]);
 
   useEffect(() => {
     const fetchMenuAndBookings = async () => {
