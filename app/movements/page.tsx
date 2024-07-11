@@ -5,6 +5,7 @@ import PageHeader from "@/components/PageHeader";
 import { MovementType } from "@/types/MovementType";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
+import MealCard from "@/components/MealCard";
 
 const columnHelper = createColumnHelper<MovementType>();
 
@@ -38,6 +39,7 @@ const MovementsPage: NextPage = () => {
   return (
     <>
       <PageHeader title="Movements List" />
+      <MealCard />
       <DataTable columns={columns} data={movementData} />
     </>
   );
