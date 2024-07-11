@@ -17,7 +17,8 @@ const SelectAmount: React.FC<Props> = ({ selectedAmount, onAmountSelect }) => {
   const amounts = getAmountList();
   return (
     <div>
-      <Label htmlFor="date">Select Amount</Label>
+      <Label htmlFor="amount">Select Amount</Label>
+
       <Select onValueChange={onAmountSelect} value={selectedAmount}>
         <SelectTrigger>
           <SelectValue placeholder="Amount" />
