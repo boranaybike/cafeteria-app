@@ -3,6 +3,7 @@ import User from "@/models/user";
 import { NextResponse } from "next/server";
 import { SignJWT } from "jose";
 import { getSecret } from "@/utils/auth";
+import bcrypt from 'bcryptjs';
 
 export const POST = async (request: any) => {
   try {
@@ -10,7 +11,7 @@ export const POST = async (request: any) => {
     const { card_number, password } = await request.json()
     const existingUser = await User.findOne({ card_number: card_number})
 
-    if (!existingUser || existingUser.password !== password) {
+    if (!existingUser || !(await bcrypt.compare(password, existingUser.password))) {
       return NextResponse.json({
         error: "Invalid credentials",
         success: false
