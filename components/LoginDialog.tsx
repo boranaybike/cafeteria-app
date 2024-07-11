@@ -14,6 +14,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
+import { showMessage } from "@/utils/messageHandler";
 
 const LoginDialog: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -38,14 +39,15 @@ const LoginDialog: React.FC = () => {
       axios.post("/api/auth/signin", formData).then((response) => {
         if (response.status === 200) {
           login(response.data.token);
-          console.log("Login successful");
+          showMessage("Login successful", "success");
           router.push("/");
         } else {
-          console.error("Login failed");
+          showMessage("Login failed", "error");
         }
       });
     } catch (error) {
       console.error("An error occurred: ", error);
+      showMessage("Login failed", "error");
     }
   };
   return (

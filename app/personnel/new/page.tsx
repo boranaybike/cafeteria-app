@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import SelectRole from "@/components/Select/SelectRole";
 import { Button } from "@/components/ui/button";
+import { showMessage } from "@/utils/messageHandler";
 
 const NewPersonnel: NextPage = () => {
   const [user, setUser] = useState({
@@ -51,7 +52,7 @@ const NewPersonnel: NextPage = () => {
         role: "",
       });
     } catch (error) {
-      console.error("Error adding personnel: ", error);
+      showMessage("Error adding personnel: ", "error");
     }
   };
   return (
@@ -99,7 +100,7 @@ const NewPersonnel: NextPage = () => {
                     Password
                   </Label>
                   <Input
-                    type="text"
+                    type="password"
                     name="password"
                     value={user.password}
                     onChange={handleChange}

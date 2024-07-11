@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { showMessage } from "@/utils/messageHandler";
 
 interface SelectMenuProps {
   onMenuChange: (menuId: string) => void;
@@ -27,7 +28,8 @@ const SelectMenu: React.FC<SelectMenuProps> = ({
         const response = await axios.get("/api/menu");
         setMenus(response.data.data);
       } catch (error) {
-        console.error("Failed to fetch menus:", error);
+        showMessage("Error fetching menus", "error");
+        console.error("Failed to fetching menus:", error);
       }
     };
 

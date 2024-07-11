@@ -1,4 +1,5 @@
 import { useUser } from "@/context/UserContext";
+import { showMessage } from "@/utils/messageHandler";
 import axios from "axios";
 
 const LogoutButton: React.FC = () => {
@@ -7,8 +8,10 @@ const LogoutButton: React.FC = () => {
     try {
       await axios.post("/api/auth/signout");
       logout();
+      showMessage("Logout successful", "success");
     } catch (error) {
       console.error("An error occurred: ", error);
+      showMessage("Logout failed", "error");
     }
   };
 

@@ -3,6 +3,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 import SideBar from "@/components/SideBar";
 import { UserProvider } from "../context/UserContext";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 export default function RootLayout({
   children,
@@ -13,6 +15,7 @@ export default function RootLayout({
     <UserProvider>
       <html lang="en">
         <body className={inter.className}>
+          <ToastContainer />
           <div className="flex">
             <div>
               <SideBar />

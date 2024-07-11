@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MenuType } from "@/types/MenuType";
+import { showMessage } from "@/utils/messageHandler";
 import { getDayOfWeek } from "@/utils/shared";
 import axios from "axios";
 import { NextPage } from "next";
@@ -47,15 +48,15 @@ const CreateMenu: NextPage = () => {
     e.preventDefault();
     try {
       await axios.post("/api/menu/new", menu);
-      console.log("Reservation created successfully!");
+      showMessage("Reservation created successfully!", "success");
       setMenu({
         date: "",
         day: "",
         meal: "",
       });
       fetchMenu();
-    } catch (error) {
-      console.error("Error creating menu: ", error);
+    } catch {
+      showMessage("Error creating menu", "error");
     }
   };
 
@@ -65,7 +66,7 @@ const CreateMenu: NextPage = () => {
       const data = response.data.data;
       setMenuData(data);
     } catch (error) {
-      console.error("Error fetching menu: ", error);
+      showMessage("Error fetching menu", "error");
     }
   };
   const dates = menuData.map((menu) => menu.date);

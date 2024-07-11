@@ -5,6 +5,7 @@ import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { format, isFuture } from "date-fns";
+import { showMessage } from "@/utils/messageHandler";
 
 const columnHelper = createColumnHelper<MenuType>();
 
@@ -33,7 +34,8 @@ const MenuList: React.FC = () => {
         );
         setMenuData(activeMenuData);
       } catch (error) {
-        console.error("An error occurred while fetching menu data.", error);
+        console.error("An error occurred while fetching menu data: ", error);
+        showMessage("Error fetching menu: ", "error");
       }
     };
 
