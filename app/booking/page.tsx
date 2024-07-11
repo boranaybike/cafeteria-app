@@ -19,6 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Minus, Plus } from "lucide-react";
 import { MenuType } from "@/types/MenuType";
 import { BookingType } from "@/types/BookingType";
+import { showMessage } from "@/utils/messageHandler";
 
 interface Reservation {
   isChecked: boolean;
@@ -30,9 +31,6 @@ const BookingPage: NextPage = () => {
   const [selectedReservations, setSelectedReservations] = useState<
     Record<string, Reservation>
   >({});
-  const [existingReservations, setExistingReservations] = useState<
-    Record<string, Reservation>
-  >({});
   const [menuList, setMenuList] = useState([]);
 
   useEffect(() => {
@@ -40,10 +38,6 @@ const BookingPage: NextPage = () => {
       try {
         const menuResponse = await axios.get("/api/menu");
         const menu: MenuType[] = menuResponse.data.data;
-        const activeMenuList = menu.filter((menu: any) =>
-          isFuture(new Date(menu.date))
-        );
-
         const bookingResponse = await axios.get("/api/booking");
         const reservationList = bookingResponse.data.data;
 
@@ -53,9 +47,9 @@ const BookingPage: NextPage = () => {
               reservation.creator?._id === user.user_id
           );
 
-          const combinedMenuList = activeMenuList.map((menu: any) => {
+          const combinedMenuList = menu.map((menu: MenuType) => {
             const existingReservation = userReservations.find(
-              (reservation: any) => reservation.menu?._id === menu._id
+              (reservation: BookingType) => reservation.menu?._id === menu._id
             );
             return {
               ...menu,
@@ -74,11 +68,10 @@ const BookingPage: NextPage = () => {
               };
             }
           });
-          setExistingReservations(existingRes);
           setSelectedReservations(existingRes);
         }
       } catch (error) {
-        console.error("Error fetching menu and reservations: ", error);
+        showMessage("Error fetching menu and reservations: ", "error");
       }
     };
 
@@ -101,37 +94,23 @@ const BookingPage: NextPage = () => {
     e.preventDefault();
 
     const newReservations = Object.entries(selectedReservations)
-      .filter(
-        ([menuId, value]) =>
-          value.isChecked && !(menuId in existingReservations)
-      )
+      .filter(([menuId, value]) => value.isChecked)
       .map(([menuId, value]) => ({
-        amount: value.amount,
+        amount: value.amount ? value.amount : 1,
         menu: menuId,
         creator: user?.user_id,
       }));
 
     if (newReservations.length === 0) {
-      console.log("No new reservations to create.");
+      await axios.post("/api/booking/new", {});
       return;
     }
 
     try {
-      const response = await axios.post("/api/booking/new", {
-        reservations: newReservations,
-      });
-      console.log("Reservations created successfully!", response.data.data);
-    } catch (error: any) {
-      console.error("Error creating reservation: ", error.response.data);
-    }
-  };
-
-  const handleCancelReservation = async (reservationId: string) => {
-    try {
-      await axios.delete(`/api/booking/${reservationId}`);
-      console.log("Reservation cancelled successfully!");
-    } catch (error) {
-      console.error("Error cancelling reservation: ", error);
+      await axios.post("/api/booking/new", { reservations: newReservations });
+      showMessage("Reservations updated successfully!", "success");
+    } catch {
+      showMessage("Error creating reservation:", "error");
     }
   };
 
@@ -212,17 +191,6 @@ const BookingPage: NextPage = () => {
             <Plus />
           </Button>
         </div>
-      ),
-    }),
-    columnHelper.display({
-      id: "actions",
-      cell: ({ row }) => (
-        <Button
-          variant="outline"
-          onClick={() => handleCancelReservation(row.original._id)}
-        >
-          Cancel Reservation
-        </Button>
       ),
     }),
   ];
