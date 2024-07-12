@@ -1,5 +1,5 @@
+import Booking from "@/models/Booking";
 import { connectToDB } from "@/utils/database"
-import Booking from "@/models/booking"
 import { NextResponse } from "next/server"
 
 export const POST = async (request: any) => {

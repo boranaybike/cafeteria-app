@@ -1,4 +1,4 @@
-import Booking from "@/models/booking"
+import Booking from "@/models/Booking"
 import { connectToDB } from "@/utils/database"
 
 export const GET = async () => {

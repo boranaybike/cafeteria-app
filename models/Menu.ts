@@ -1,6 +1,6 @@
 import { Schema, model, models } from 'mongoose';
 
-const menuSchema = new Schema({
+const MenuSchema = new Schema({
     meal: {
         type: String
     },
@@ -12,6 +12,6 @@ const menuSchema = new Schema({
     }
 })
 
-const Menu = models.Menu || model("Menu", menuSchema)
+const Menu = models.Menu || model("Menu", MenuSchema)
 
 export default Menu

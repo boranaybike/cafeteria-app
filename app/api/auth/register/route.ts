@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectToDB } from "@/utils/database";
 import { generateNumber } from '@/utils/shared';
-import User from "@/models/user";
+import User from "@/models/User";
 import bcrypt from 'bcryptjs';
 
 export const POST = async (request: any) => {
