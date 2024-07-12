@@ -13,7 +13,7 @@ import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import axios from "axios";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
-import { format, isFuture } from "date-fns";
+import { format } from "date-fns";
 import { useUser } from "@/context/UserContext";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Minus, Plus } from "lucide-react";
